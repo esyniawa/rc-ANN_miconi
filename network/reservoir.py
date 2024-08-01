@@ -1,5 +1,7 @@
 import numpy as np
 import ANNarchy as ann
+ann.setup(num_threads=4)
+
 import os
 import matplotlib.pyplot as plt
 
@@ -142,7 +144,7 @@ class MiconiReservoir:
 
         R_mean = 0.0
         error_history = []
-        weight_history = []
+        eigvals = []
 
         # Switch off perturbations if needed
         if not perturbation:
@@ -193,18 +195,17 @@ class MiconiReservoir:
                 R_mean = alpha * R_mean + (1. - alpha) * error
 
                 # Store weight + error history
-                weight_history.append(self.extract_recurrent_weights())
+                eigvals.append(self.calculate_eigenvals(self.extract_recurrent_weights()))
                 error_history.append(error)
 
         if plot:
             if not os.path.exists('figures/' + folder):
                 os.makedirs('figures/' + folder)
 
-            eigvals = self.calculate_eigenvals(weight_history)
 
             fig, axs = plt.subplots(nrows=2)
             axs[0].plot(np.array(error_history), label='Error')
-            axs[1].plot(eigvals, label='Eigenvalues')
+            axs[1].plot(np.array(eigvals), label='Eigenvalues')
             plt.legend()
             plt.savefig('figures/' + folder + 'error.png')
             plt.savefig('figures/' + folder + 'error.png')
@@ -246,8 +247,5 @@ class MiconiReservoir:
         return y, T
 
     @staticmethod
-    def calculate_eigenvals(mat: list[np.ndarray]):
-        eigvals = []
-        for t in range(len(mat)):
-            eigvals.append(np.linalg.eigvalsh(mat[t]))
-        return np.array(eigvals)
+    def calculate_eigenvals(mat: np.ndarray):
+        return np.linalg.eigvalsh(mat)
