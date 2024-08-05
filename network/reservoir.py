@@ -11,7 +11,7 @@ from .definitions import InputNeuron, OutputNeuron, MiconiNeuron, MiconiLearning
 
 class MiconiReservoir:
     def __init__(self,
-                 N_res: int = 500,
+                 N_res: int = 1000,
                  N_in: int = 2,
                  N_out: int = 2,
                  rho: float = 1.5,
@@ -212,7 +212,7 @@ class MiconiReservoir:
             max_eig = np.max(np.abs(np.array(eigvals)))
 
             axs[0].plot(np.array(error_history), label='Error')
-            im = axs[1].imshow(np.array(eigvals), vmin=-max_eig, vmax=max_eig, cmap='RdBu', label='Eigenvalues')
+            im = axs[1].imshow(np.array(eigvals).T, vmin=-max_eig, vmax=max_eig, cmap='RdBu', label='Eigenvalues')
             divider = make_axes_locatable(axs[1])
             cax = divider.append_axes('right', size='5%', pad=0.05)
 
