@@ -209,7 +209,8 @@ class MiconiReservoir:
                 os.makedirs('figures/' + folder)
 
             fig, axs = plt.subplots(nrows=2)
-            max_eig = np.amax(np.amax(eigvals), np.abs(np.amin(eigvals)))
+            max_eig = np.max(np.abs(np.array(eigvals)))
+
             axs[0].plot(np.array(error_history), label='Error')
             im = axs[1].imshow(np.array(eigvals), vmin=-max_eig, vmax=max_eig, cmap='RdBu', label='Eigenvalues')
             divider = make_axes_locatable(axs[1])
