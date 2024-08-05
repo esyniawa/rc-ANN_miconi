@@ -208,7 +208,6 @@ class MiconiReservoir:
             axs[1].plot(np.array(eigvals), label='Eigenvalues')
             plt.legend()
             plt.savefig('figures/' + folder + 'error.png')
-            plt.savefig('figures/' + folder + 'error.png')
 
         # Switch back on perturbations if needed
         if not perturbation:
