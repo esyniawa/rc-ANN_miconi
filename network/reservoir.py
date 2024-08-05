@@ -203,13 +203,19 @@ class MiconiReservoir:
                 error_history.append(error)
 
         if plot:
+            from mpl_toolkits.axes_grid1 import make_axes_locatable
+
             if not os.path.exists('figures/' + folder):
                 os.makedirs('figures/' + folder)
 
-
             fig, axs = plt.subplots(nrows=2)
+            max_eig = np.amax(np.amax(eigvals), np.abs(np.amin(eigvals)))
             axs[0].plot(np.array(error_history), label='Error')
-            axs[1].plot(np.array(eigvals), label='Eigenvalues')
+            im = axs[1].imshow(np.array(eigvals), vmin=-max_eig, vmax=max_eig, cmap='RdBu', label='Eigenvalues')
+            divider = make_axes_locatable(axs[1])
+            cax = divider.append_axes('right', size='5%', pad=0.05)
+
+            fig.colorbar(im, cax=cax, orientation='vertical')
             plt.legend()
             plt.savefig('figures/' + folder + 'error.png')
 
