@@ -124,6 +124,7 @@ class MiconiReservoir:
 
     def run_target(self,
                    data_target: np.ndarray,
+                   data_input: np.ndarray | None,
                    folder: str,
                    alpha: float = 0.8,
                    d_stim: float = 200,
@@ -162,7 +163,10 @@ class MiconiReservoir:
                 pop[2].r = np.tanh(-1.0)
 
             # First input
-            inp.baseline = data_target[t]
+            if data_input is not None:
+                inp.baseline = data_input[t]
+            else:
+                inp.baseline = data_target[t]
             ann.simulate(d_stim, net_id=self.network.id)
 
             # Response
