@@ -64,7 +64,7 @@ class MiconiReservoir:
         for i in range(self.N_out):
             id_start = id_end - n_out
             proj = ann.Projection(pre=res_pop[id_start:id_end], post=out_pop[i], target='in')
-            proj.connect_one_to_one(1.0)
+            proj.connect_all_to_all(1.0)
             id_end = id_start
 
         monitor_out = ann.Monitor(out_pop, variables='r', period=self.sample_rate, start=False)
