@@ -14,6 +14,7 @@ class MiconiReservoir:
                  N_res: int = 1000,
                  N_in: int = 2,
                  N_out: int = 2,
+                 N_output_neurons: int = 10,
                  rho: float = 1.5,
                  sigma_rec: float = 0.1):
 
@@ -26,9 +27,10 @@ class MiconiReservoir:
         self.monitors = {}
         self.sample_rate = 1.0
 
-        self.network = self.build_network(g=rho, sparseness=sigma_rec)
+        self.network = self.build_network(n_out=N_output_neurons, g=rho, sparseness=sigma_rec)
 
     def build_network(self,
+                      n_out: int,
                       g: float,
                       sparseness: float):
 
@@ -57,11 +59,13 @@ class MiconiReservoir:
             Wrec.connect_fixed_probability(probability=sparseness,
                                            weights=ann.Normal(0., g / np.sqrt(sparseness * self.N_res)))
 
+        id_end = self.N_res - 1
         # Pick the output neurons
         for i in range(self.N_out):
-            id_out = self.N_res - i - 1
-            proj = ann.Projection(pre=res_pop[id_out], post=out_pop[i], target='in')
+            id_start = id_end - n_out
+            proj = ann.Projection(pre=res_pop[id_start:id_end], post=out_pop[i], target='in')
             proj.connect_one_to_one(1.0)
+            id_end = id_start
 
         monitor_out = ann.Monitor(out_pop, variables='r', period=self.sample_rate, start=False)
         self.monitors[out_pop.name] = monitor_out
@@ -212,18 +216,17 @@ class MiconiReservoir:
             max_eig = np.max(np.abs(np.array(eigvals)))
 
             axs[0].plot(np.array(error_history), label='Error')
-            im = axs[1].imshow(np.array(eigvals).T, vmin=-max_eig, vmax=max_eig, cmap='RdBu', label='Eigenvalues')
+            axs[1].plot(np.array(eigvals), label='Eigenvalues', alpha=0.5)
+            axs[1].set_ylim([-max_eig, max_eig])
+
             divider = make_axes_locatable(axs[1])
             cax = divider.append_axes('right', size='5%', pad=0.05)
-
-            fig.colorbar(im, cax=cax, orientation='vertical')
             plt.legend()
             plt.savefig('figures/' + folder + 'error.png')
 
         # Switch back on perturbations if needed
         if not perturbation:
             pop.A = old_A
-
 
     @staticmethod
     def make_dynamic_target(dim_out: int,
